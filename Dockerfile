@@ -1,4 +1,4 @@
-FROM hseeberger/scala-sbt:8u212_2.13.0_1.2.8 as build
+FROM hseeberger/scala-sbt:8u222_1.3.5_2.13.1 as build
 COPY ./ /app
 RUN cd /app && sbt assembly
 

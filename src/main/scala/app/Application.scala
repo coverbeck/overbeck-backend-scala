@@ -1,24 +1,10 @@
 package app
 
-import org.overbeck.anagram.{Anagrammer, AnagrammerException}
-import ujson._
+import org.overbeck.anagram.AnagramRoutes
 
-object Application extends cask.MainRoutes {
-
+object MinimalRoutesMain extends cask.Main {
   // Won't work in Docker otherwise
   override def host: String = "0.0.0.0"
+  val allRoutes = Seq(AnagramRoutes())
 
-  @cask.postJson("/")
-  def hello(input: Value) = {
-    try {
-      val hits = Anagrammer.matches(input.str)
-      cask.Response(Obj(
-        "hits" -> hits
-      ))
-    } catch {
-      case ex: AnagrammerException => cask.Response(Obj("message" -> ex.getMessage), 400)
-    }
-  }
-
-  initialize()
 }

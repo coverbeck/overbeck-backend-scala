@@ -5,12 +5,14 @@ import ujson.{Arr, Obj, Value}
 
 case class AnagramRoutes()(implicit val log: cask.Logger) extends cask.Routes {
   @cask.postJson("/anagram")
-  def hello(input: Value): Response[Value] = {
+  def findAnagrams(input: Value): Response[Value] = {
     try {
-      val hits = Anagrammer.matches(input.str)
-      cask.Response(hits)
+      cask.Response(Anagrammer.matches(input.str))
     } catch {
-      case ex: AnagrammerException => cask.Response(Obj("message" -> ex.getMessage), 400)
+      case ex: AnagrammerException => {
+        log.exception(ex);
+        cask.Response(Obj("message" -> ex.getMessage), 400)
+      }
     }
   }
 

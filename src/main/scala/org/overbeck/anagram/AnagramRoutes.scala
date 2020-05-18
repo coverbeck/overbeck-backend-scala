@@ -1,7 +1,7 @@
 package org.overbeck.anagram
 
 import cask.model.Response
-import ujson.{Arr, Obj, Value}
+import ujson.{Obj, Value}
 
 case class AnagramRoutes()(implicit val log: cask.Logger) extends cask.Routes {
   @cask.postJson("/anagram")

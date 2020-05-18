@@ -15,8 +15,7 @@ object Anagrammer {
       case i @ _ if i > 10 => throw new AnagrammerException("A maximum of 10 characters is allowed")
       case _ =>
     }
-    val found: Option[Seq[String]] = dictionary.get(input.toSeq.sorted.unwrap)
-    val results: Seq[String] = found.map(s => s).getOrElse(Seq.empty)
+    val results: Seq[String] = dictionary.get(input.toSeq.sorted.unwrap).getOrElse(Seq.empty)
     results ++ (for (i <- input.length - 1 to 2 by -1)
       yield input.toSeq.combinations(i).map(s => dictionary.get(s.toSeq.sorted.unwrap)).flatten.flatten.toSeq).flatten
   }

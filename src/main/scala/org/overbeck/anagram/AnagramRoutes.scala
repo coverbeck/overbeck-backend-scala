@@ -1,13 +1,13 @@
 package org.overbeck.anagram
 
-import cask.model.Response
+import cask.model.{FormValue, Response}
 import ujson.{Obj, Value}
 
 case class AnagramRoutes()(implicit val log: cask.Logger) extends cask.Routes {
-  @cask.postJson("/anagram")
-  def findAnagrams(input: Value): Response[Value] = {
+  @cask.postForm("/anagram")
+  def findAnagrams(input: FormValue): Response[Value] = {
     try {
-      cask.Response(Anagrammer.matches(input.str))
+      cask.Response(Anagrammer.matches(input.value))
     } catch {
       case ex: AnagrammerException => {
         log.exception(ex);

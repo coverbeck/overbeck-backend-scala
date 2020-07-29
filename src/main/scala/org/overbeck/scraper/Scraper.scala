@@ -5,8 +5,6 @@ import java.util.{Calendar, TimeZone}
 import org.jsoup.Jsoup
 import ujson.{Arr, Obj}
 
-import scala.None
-
 object Scraper {
 
   def availableScrapes() = {

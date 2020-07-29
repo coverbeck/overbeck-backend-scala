@@ -13,24 +13,18 @@ case class ScraperRoutes()(implicit val log: cask.Logger) extends cask.Routes {
   @cask.getJson("/portal")
   def availableScrapes(apikey: String = ""): Response[Value] = {
     if (isAuthorized(apikey)) cask.Response("Unauthorized", 401)
-    else cask.Response((Arr(
-      Obj("style" -> "wide", "name" -> "adamathome")
-    )), 200)
+    else cask.Response(Scraper.availableScrapes, 200)
   }
+
+//  @cask.get("/portal/:item")
+//  def item(item: String): Response = {
+//    cask.Response()
+//  }
 
   private def isAuthorized(apikey: String) = {
     APIKEY != Some(apikey)
   }
 
   initialize();
-
-  /*
-      'adam': 'adamathome',
-    'calvin': 'calvinandhobbes',
-    'duplex': 'duplex',
-    'nancy': 'nancy',
-    'pooch': 'poochcafe'
-
-   */
 
 }

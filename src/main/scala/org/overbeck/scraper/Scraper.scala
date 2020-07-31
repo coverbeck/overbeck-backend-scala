@@ -5,6 +5,9 @@ import java.util.{Calendar, TimeZone}
 import org.jsoup.Jsoup
 import ujson.{Arr, Obj}
 
+import scala.jdk.CollectionConverters._
+
+
 object Scraper {
 
   def availableScrapes() = {
@@ -18,8 +21,8 @@ object Scraper {
     val url = s"https://www.gocomics.com/adamathome/${now.get(Calendar.YEAR)}/${now.get(Calendar.MONTH) + 1}/${now.get(Calendar.DAY_OF_MONTH)}"
     val doc = Jsoup.connect(url).get()
     val elements = doc.select("div[data-image^=https]")
-    if (elements.size() != 1) None
-    else Some(elements.get(0).attributes().dataset().get("image"))
+    if (elements.isEmpty == 0) None
+    else elements.get(0).attributes().dataset().asScala.get("image")
   }
 
   /*

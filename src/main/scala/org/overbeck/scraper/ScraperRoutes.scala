@@ -20,7 +20,7 @@ case class ScraperRoutes()(implicit val log: cask.Logger) extends cask.Routes {
 
   @cask.decorators.compress
   @cask.get("/portal/:item")
-  def item(item: String, apikey: String = ""): Response[Array[Byte]] = {
+  def item(item: Int, apikey: String = ""): Response[Array[Byte]] = {
     if (!isAuthorized(apikey)) cask.Response("Unauthorized".getBytes, 403, TEXT_PLAIN_HEADER)
     Scraper.item(item) match {
       case Some(url) => {

@@ -12,4 +12,6 @@ libraryDependencies += "org.jsoup" % "jsoup" % "1.13.1"
 
 libraryDependencies += "com.lihaoyi" %% "requests" % "0.6.5"
 
+libraryDependencies += "com.lihaoyi" %% "upickle" % "0.9.5"
+
 testFrameworks += new TestFramework("utest.runner.Framework")

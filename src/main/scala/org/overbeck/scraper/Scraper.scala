@@ -3,38 +3,45 @@ package org.overbeck.scraper
 import java.util.{Calendar, TimeZone}
 
 import org.jsoup.Jsoup
+import org.overbeck.scraper.Scraper.rawScraperData
 import ujson.{Arr, Obj}
+import upickle.legacy.writeJs
 
+import scala.io.Source
 import scala.jdk.CollectionConverters._
 
 
 object Scraper {
 
+  implicit val ScraperDataRW = upickle.default.macroRW[ScraperData]
+  private val rawScraperData: String = Source.fromFile("/home/coverbeck/git/coverbeck/overbeck-backend-scala/scrape.json").mkString
+
   def availableScrapes() = {
-    Arr(
-      Obj("style" -> "wide", "name" -> "adamathome")
-    )
+    upickle.default.writeJs(scraperData(rawScraperData))
   }
 
-  def item(item: String) = {
+  def item(item: Int) = {
+    scraperData(rawScraperData).find(s => s.id == item ) match {
+      case Some(s) => {
+        val doc = Jsoup.connect(s.url).get()
+        val elements = doc.select(s.selector)
+        if (elements.isEmpty == 0) None
+        else {
+          if (s.attribute.startsWith("data-")) elements.get(0).attributes().dataset().asScala.get(s.attribute.substring(5))
+          else Some(elements.get(0).attributes().get(s.attribute))
+        }
+      }
+      case None => None
+    }
+  }
+
+  def scraperData(rawScraperData: String): Seq[ScraperData] = {
+    upickle.default.read[Seq[ScraperData]](processDates(rawScraperData))
+  }
+
+  def processDates(input: String): String = {
     val now = Calendar.getInstance(TimeZone.getTimeZone("America/Los Angeles"))
-    val url = s"https://www.gocomics.com/adamathome/${now.get(Calendar.YEAR)}/${now.get(Calendar.MONTH) + 1}/${now.get(Calendar.DAY_OF_MONTH)}"
-    val doc = Jsoup.connect(url).get()
-    val elements = doc.select("div[data-image^=https]")
-    if (elements.isEmpty == 0) None
-    else elements.get(0).attributes().dataset().asScala.get("image")
+    input.replaceAll("\\$\\{date}", s"${now.get(Calendar.YEAR)}/${now.get(Calendar.MONTH) + 1}/${now.get(Calendar.DAY_OF_MONTH)}")
   }
-
-  /*
-      'adam': 'adamathome',
-    'calvin': 'calvinandhobbes',
-    'duplex': 'duplex',
-    'nancy': 'nancy',
-    'pooch': 'poochcafe'
-
-   */
-
-
-
 
 }

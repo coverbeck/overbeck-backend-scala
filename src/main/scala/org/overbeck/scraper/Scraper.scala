@@ -25,7 +25,7 @@ object Scraper {
       case Some(s) => {
         val doc = Jsoup.connect(s.url).get()
         val elements = doc.select(s.selector)
-        if (elements.isEmpty == 0) None
+        if (elements.isEmpty) None
         else {
           if (s.attribute.startsWith("data-")) elements.get(0).attributes().dataset().asScala.get(s.attribute.substring(5))
           else Some(elements.get(0).attributes().get(s.attribute))

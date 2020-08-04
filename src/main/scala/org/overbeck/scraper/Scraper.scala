@@ -3,9 +3,6 @@ package org.overbeck.scraper
 import java.util.{Calendar, TimeZone}
 
 import org.jsoup.Jsoup
-import org.overbeck.scraper.Scraper.rawScraperData
-import ujson.{Arr, Obj}
-import upickle.legacy.writeJs
 
 import scala.io.Source
 import scala.jdk.CollectionConverters._
@@ -14,7 +11,7 @@ import scala.jdk.CollectionConverters._
 object Scraper {
 
   implicit val ScraperDataRW = upickle.default.macroRW[ScraperData]
-  private val rawScraperData: String = Source.fromFile("/home/coverbeck/git/coverbeck/overbeck-backend-scala/scrape.json").mkString
+  private val rawScraperData: String = readScrapeConfig()
 
   def availableScrapes() = {
     upickle.default.writeJs(scraperData(rawScraperData))
@@ -42,6 +39,13 @@ object Scraper {
   def processDates(input: String): String = {
     val now = Calendar.getInstance(TimeZone.getTimeZone("America/Los Angeles"))
     input.replaceAll("\\$\\{date}", s"${now.get(Calendar.YEAR)}/${now.get(Calendar.MONTH) + 1}/${now.get(Calendar.DAY_OF_MONTH)}")
+  }
+
+  def readScrapeConfig() = {
+    System.getenv().asScala.get("SCRAPE_CONFIG") match {
+      case Some(file) => Source.fromFile(file).mkString
+      case _ => Source.fromResource("scrape.json").mkString
+    }
   }
 
 }

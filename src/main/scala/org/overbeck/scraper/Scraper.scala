@@ -1,6 +1,6 @@
 package org.overbeck.scraper
 
-import java.util.{Calendar, TimeZone}
+import java.time.{ZoneId, ZonedDateTime}
 
 import org.jsoup.Jsoup
 
@@ -37,8 +37,9 @@ object Scraper {
   }
 
   def processDates(input: String): String = {
-    val now = Calendar.getInstance(TimeZone.getTimeZone("America/Los Angeles"))
-    input.replaceAll("\\$\\{date}", s"${now.get(Calendar.YEAR)}/${now.get(Calendar.MONTH) + 1}/${now.get(Calendar.DAY_OF_MONTH)}")
+    val zoneId = ZoneId.of("America/Los_Angeles")
+    val zonedDateTime = ZonedDateTime.now(zoneId)
+    input.replaceAll("\\$\\{date}", s"${zonedDateTime.getYear}/${zonedDateTime.getMonthValue}/${zonedDateTime.getDayOfMonth}")
   }
 
   def readScrapeConfig() = {

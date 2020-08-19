@@ -7,6 +7,7 @@ import org.jsoup.Jsoup
 import scala.io.Source
 import scala.jdk.CollectionConverters._
 
+case class FetchImageData(url: String, referer: String)
 
 object Scraper {
 
@@ -17,15 +18,18 @@ object Scraper {
     upickle.default.writeJs(scraperData(rawScraperData))
   }
 
-  def item(item: Int) = {
+  def item(item: Int): Option[FetchImageData] = {
     scraperData(rawScraperData).find(s => s.id == item ) match {
       case Some(s) => {
         val doc = Jsoup.connect(s.url).get()
         val elements = doc.select(s.selector)
         if (elements.isEmpty) None
         else {
-          if (s.attribute.startsWith("data-")) elements.get(0).attributes().dataset().asScala.get(s.attribute.substring(5))
-          else Some(elements.get(0).attributes().get(s.attribute))
+          if (s.attribute.startsWith("data-")) {
+            val maybeString = elements.get(0).attributes().dataset().asScala.get(s.attribute.substring(5))
+            if (maybeString.isDefined) Some(FetchImageData(maybeString.get, s.url)) else None
+          }
+          else Some(FetchImageData(elements.get(0).attributes().get(s.attribute), s.url))
         }
       }
       case None => None

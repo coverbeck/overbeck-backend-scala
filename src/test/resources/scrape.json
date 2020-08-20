@@ -4,6 +4,7 @@
     "url": "https://www.google.com",
     "style": "width: 700px",
     "selector": "img",
-    "attribute": "src"
+    "attribute": "src",
+    "elementType": "image"
   }
 ]

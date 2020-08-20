@@ -1,6 +1,5 @@
 package org.overbeck.scraper
 import cask.Response
-import requests.check
 import ujson.Value
 
 import scala.jdk.CollectionConverters._
@@ -24,18 +23,11 @@ case class ScraperRoutes()(implicit val log: cask.Logger) extends cask.Routes {
   def item(id: Int, apikey: String = ""): Response[Array[Byte]] = {
     if (!isAuthorized(apikey)) cask.Response("Unauthorized".getBytes, 403, TEXT_PLAIN_HEADER)
     Scraper.item(id) match {
-      case Some(fetchImageData: FetchImageData) => {
-        val item = requests.get(fetchImageData.url, check = false, headers = Seq(("Referer", fetchImageData.referer)))
-        cask.Response(item.bytes, item.statusCode, headers(item))
+      case Some(scrapedData) => {
+        cask.Response(scrapedData.bytes, scrapedData.statusCode, scrapedData.headers)
       }
       case None => cask.Response("Not found".getBytes, 404, TEXT_PLAIN_HEADER)
     }
-  }
-
-  private def headers(item: requests.Response) = {
-    Seq("content-type", "content-disposition", "content-transfer-encoding").flatMap(headerName => {
-      item.headers.get(headerName).getOrElse(Seq.empty[String]).map(s => (headerName -> s))
-    })
   }
 
   private def isAuthorized(apikey: String) = {

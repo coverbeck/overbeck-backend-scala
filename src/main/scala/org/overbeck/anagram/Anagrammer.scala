@@ -16,8 +16,9 @@ object Anagrammer {
       case _ =>
     }
     val results: Seq[String] = dictionary.get(input.toSeq.sorted.unwrap).getOrElse(Seq.empty)
-    results ++ (for (i <- input.length - 1 to 2 by -1)
-      yield Success(input.toSeq.combinations(i).map(s => dictionary.get(s.toSeq.sorted.unwrap)).flatten.flatten.toSeq).flatten)
+    val response = results ++ (for (i <- input.length - 1 to 2 by -1)
+      yield input.toSeq.combinations(i).map(s => dictionary.get(s.toSeq.sorted.unwrap)).flatten.flatten.toSeq).flatten
+    Success(response)
   }
 
   def matches(input: String): Try[Seq[String]] = matches(input, dictionary)

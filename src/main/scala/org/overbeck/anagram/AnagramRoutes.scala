@@ -10,7 +10,7 @@ case class AnagramRoutes()(implicit val log: cask.Logger) extends cask.Routes {
   def findAnagrams(input: Value): Response[Value] = {
       val matches = Anagrammer.matches(input.str)
       matches match {
-        case Success(strs) => cask.Response(strs, 200, Seq(("Content-type", "application/json"))))
+        case Success(strs) => cask.Response(strs, 200, Seq(("Content-type", "application/json")))
         case Failure(ex) => {
           log.exception(ex);
           cask.Response(Obj("message" -> ex.getMessage), 400)

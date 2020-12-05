@@ -50,5 +50,4 @@ object ElectionAnalyzer {
   object USHouseDataSlim {
     implicit def todoRW: upickle.default.ReadWriter[USHouseDataSlim] = upickle.default.macroRW[USHouseDataSlim]
   }
-K
 }

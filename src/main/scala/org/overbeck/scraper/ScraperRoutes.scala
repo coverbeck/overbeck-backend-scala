@@ -34,6 +34,6 @@ case class ScraperRoutes()(implicit val log: cask.Logger) extends cask.Routes {
     APIKEY == Some(apikey)
   }
 
-  initialize();
+  initialize()
 
 }

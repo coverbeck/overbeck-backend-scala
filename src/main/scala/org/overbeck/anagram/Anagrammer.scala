@@ -21,7 +21,7 @@ object Anagrammer {
     Success(response)
   }
 
-  def matches(input: String): Try[Seq[String]] = matches(input, dictionary)
+  def matches(input: String): Try[Seq[String]] = matches(input.toLowerCase, dictionary)
 
 }
 

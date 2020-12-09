@@ -29,15 +29,38 @@ object ElectionAnalyzer {
       val district = firstValue.district
       val total = firstValue.totalvotes
       // There can be more than one candidate per party
-      val democrat = vector.filter(_.party == "democrat").map(_.candidatevotes).sum
-      val republic = vector.filter(_.party == "republican").map(_.candidatevotes).sum
-      val other = vector.filter(r => r.party != "democrat" && r.party != "republican").map(_.candidatevotes).sum
+      val democrat = vector.filter(r => isDemocrat(r.party)).map(_.candidatevotes).sum
+      val republic = vector.filter(r => isRepublican(r.party)).map(_.candidatevotes).sum
+      val other = vector.filter(r => !isDemocrat(r.party) && !isRepublican(r.party)).map(_.candidatevotes).sum
       val winner = vector.maxBy(_.candidatevotes)
       USHouseDataSlim(year, state, district, democrat, republic, other, total, winner.party, winner.candidatevotes, winner.candidate)
     })
     .values
     .toVector
     .sortBy(r => r.year + r.state + r.district)
+
+  def houseSummaryData(): Vector[USHouseSummary] = {
+    val data = houseData()
+    data.map(_.year).distinct
+      .map(year => {
+        val yearData = data.filter(_.year == year)
+        val dSeats = yearData.filter(r => isDemocrat(r.winningParty)).size
+        val rSeats = yearData.filter(r => isRepublican(r.winningParty)).size
+        val iSeats = yearData.filter(r => !isRepublican(r.winningParty) && !isDemocrat(r.winningParty)).size
+        val dVotes = yearData.map(_.democrat).sum
+        val rVotes = yearData.map(_.republican).sum
+        val iVotes = yearData.map(_.other).sum
+        USHouseSummary(year, dSeats, rSeats, iSeats, dVotes, rVotes, iVotes)
+      })
+  }
+
+  def isDemocrat(party: String): Boolean =
+    // Handle "democratic-farmer-labor", "foglietta (democrat)"
+    party.contains("democrat")
+
+  def isRepublican(party: String): Boolean =
+    // Handle "independent-republican" and weird data case where Tom Tancredo has no party
+    party == "republican" || party == "independent-republican" || party == ""
 
   case class USHouseData(year: Int, state: String, state_po: String, state_fips: Int, state_cen: Int,
                          state_ic: Int, office: String, district: Int, stage: String, runoff: String, special: Boolean,
@@ -48,6 +71,11 @@ object ElectionAnalyzer {
                              winningParty: String, winningVotes: Int, winningCandidate: String)
 
   object USHouseDataSlim {
-    implicit def todoRW: upickle.default.ReadWriter[USHouseDataSlim] = upickle.default.macroRW[USHouseDataSlim]
+    implicit def usHouseDataRW: upickle.default.ReadWriter[USHouseDataSlim] = upickle.default.macroRW[USHouseDataSlim]
+  }
+  case class USHouseSummary(year: Int, democratSeats: Int, republicanSeats: Int, independentSeats: Int, democratVotes: Int, republicanVotes: Int, independentVotes: Int)
+
+  object USHouseSummary {
+    implicit def usHouseSummaryRW: upickle.default.ReadWriter[USHouseSummary] = upickle.default.macroRW[USHouseSummary]
   }
 }

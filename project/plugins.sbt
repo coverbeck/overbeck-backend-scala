@@ -1,0 +1,1 @@
+addSbtPlugin("com.scalatsi" % "sbt-scala-tsi" % "0.4.1")

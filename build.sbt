@@ -1,10 +1,14 @@
 import sbt.Keys.libraryDependencies
 
+resolvers +=
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+
 lazy val root = (project in file("."))
   .enablePlugins(ScalaTsiPlugin)
   .settings(
     typescriptExports := Seq("org.overbeck.uselections.ElectionAnalyzer.USHouseSummary",
-      "org.overbeck.uselections.ElectionAnalyzer.USHouseDataSlim"),
+      "org.overbeck.uselections.ElectionAnalyzer.USHouseDataSlim",
+      "org.overbeck.weather.Weather.WeatherData"),
     typescriptOutputFile := baseDirectory.value / "model.ts"
   )
 name := "overbeck-backend"

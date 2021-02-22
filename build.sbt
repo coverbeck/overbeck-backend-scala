@@ -29,4 +29,5 @@ testFrameworks += new TestFramework("utest.runner.Framework")
 
 assemblyJarName := "overbeck-backend.jar"
 
+mainClass in (Compile, packageBin) := Some("app.MinimalRoutesMain")
 

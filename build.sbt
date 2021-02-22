@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
   "org.jsoup" % "jsoup" % "1.13.1",
   "com.lihaoyi" %% "requests" % "0.6.5",
   "com.lihaoyi" %% "upickle" % "0.9.5",
-  "org.overbeck" %% "ambient-weather-scala" % "0.0.1-SNAPSHOT"
+  "org.overbeck" %% "ambient-weather-scala" % "0.0.1  "
 )
 testFrameworks += new TestFramework("utest.runner.Framework")
 

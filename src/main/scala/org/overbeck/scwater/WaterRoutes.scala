@@ -3,7 +3,7 @@ package org.overbeck.scwater
 import cask.model.Response
 import ujson.Value
 
-import java.sql.{DriverManager, ResultSet}
+import java.sql.{DriverManager, ResultSet, Timestamp}
 import scala.util.Using
 
 case class WaterRoutes() (implicit val log: cask.Logger) extends cask.Routes {
@@ -22,7 +22,7 @@ case class WaterRoutes() (implicit val log: cask.Logger) extends cask.Routes {
       }.to(LazyList).map(rs => LochLomondData(
         rs.getString("recording_date"),
         rs.getBigDecimal("percent_full"),
-        rs.getString("created_timestamp")
+        Option(rs.getString("created_timestamp"))
       ))
       cask.Response(upickle.default.writeJs(data), 200, appJson)
     }}
@@ -38,7 +38,7 @@ object WaterRoutes {
 case class LochLomondData(
                            recordingDate: String,
                            percentFull: BigDecimal,
-                           createdDate: String
+                           createdDate: Option[String]
                          )
 object LochLomondData {
   implicit def lochLomondRS: upickle.default.ReadWriter[LochLomondData] = upickle.default.macroRW[LochLomondData]

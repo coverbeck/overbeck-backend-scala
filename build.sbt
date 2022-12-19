@@ -8,7 +8,9 @@ lazy val root = (project in file("."))
   .settings(
     typescriptExports := Seq("org.overbeck.uselections.ElectionAnalyzer.USHouseSummary",
       "org.overbeck.uselections.ElectionAnalyzer.USHouseDataSlim",
-      "org.overbeck.weather.Weather.WeatherData"),
+      "org.overbeck.weather.Weather.WeatherData",
+      "org.overbeck.scwater.LochLomondData"
+    ),
     typescriptOutputFile := baseDirectory.value / "model.ts"
   )
 name := "overbeck-backend"

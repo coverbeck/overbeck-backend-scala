@@ -16,9 +16,16 @@ object Anagrammer {
       case _ =>
     }
     val results: Seq[String] = dictionary.get(input.toSeq.sorted.unwrap).getOrElse(Seq.empty)
-    val response = results ++ (for (i <- input.length - 1 to 2 by -1)
-      yield input.toSeq.combinations(i).map(s => dictionary.get(s.toSeq.sorted.unwrap)).flatten.flatten.toSeq).flatten
+    val response = results ++ combinations(input)
     Success(response)
+  }
+
+  private def combinations(input: String) = {
+    val inputSeq = input.toSeq
+    val range = input.length - 1 to 2 by -1
+    range.flatMap(i => {
+      inputSeq.combinations(i).flatMap(cb => dictionary.get(cb.sorted.unwrap)).flatten.toSeq
+    })
   }
 
   def matches(input: String): Try[Seq[String]] = matches(input.toLowerCase, dictionary)

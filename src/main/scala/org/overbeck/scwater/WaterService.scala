@@ -4,10 +4,12 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 
+import java.time.LocalDate
+
 object WaterService {
 
   private val readingDatePattern = "ending on\\s+(\\S+)".r
-  private val dateOnPagePattern = "(\\d\\d)/(\\d\\d)/(\\d\\d\\d\\d)".r
+  private val dateOnPagePattern = "(\\d{1,2})/(\\d{1,2})/(\\d{4})".r
   def latestWaterData(): LochLomondData = {
     val connection = Jsoup.connect("https://www.cityofsantacruz.com/government/city-departments/water/weekly-water-conditions")
     val document = connection.get()
@@ -21,7 +23,12 @@ object WaterService {
         .map(_.group(1))
         .map(m => {
           val option = dateOnPagePattern.findFirstMatchIn(m)
-          option.map(m => s"${m.group(3)}-${m.group(1)}-${m.group(2)}")
+          option.map(m => {
+            val year = m.group(3).toInt
+            val month = m.group(1).toInt
+            val day = m.group(2).toInt
+            LocalDate.of(year, month, day).toString
+          })
         })
         .flatten
     } else None

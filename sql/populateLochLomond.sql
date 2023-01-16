@@ -46,3 +46,7 @@ insert into loch_lomond (recording_date, percent_full) values('2022-11-20', 75.9
 insert into loch_lomond (recording_date, percent_full) values('2022-11-27', 75.7);
 insert into loch_lomond (recording_date, percent_full) values('2022-12-04', 76.0);
 insert into loch_lomond (recording_date, percent_full) values('2022-12-11', 77.7);
+insert into loch_lomond (recording_date, percent_full) values('2022-12-18', 78.1);
+insert into loch_lomond (recording_date, percent_full) values('2022-12-25', 78.1);
+-- insert into loch_lomond (recording_date, percent_full) values('2023-01-01', 90.2);
+-- insert into loch_lomond (recording_date, percent_full) values('2023-01-08', 99.9);

@@ -18,7 +18,7 @@ object MinimalRoutesMain extends cask.Main {
     val task = new Runnable {
       def run() = WaterService.updateIfNecessary
     }
-    val f = ex.scheduleAtFixedRate(task, 0, 10, TimeUnit.SECONDS)
+    val f = ex.scheduleAtFixedRate(task, 0, 10, TimeUnit.MINUTES)
     super.main(args)
   }
 

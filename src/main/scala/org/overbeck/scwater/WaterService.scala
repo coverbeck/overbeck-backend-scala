@@ -6,7 +6,7 @@ import org.jsoup.select.Elements
 
 import java.sql.{DriverManager, ResultSet, SQLException}
 import java.time.LocalDate
-import scala.util.Using
+import scala.util.{Failure, Success, Try, Using}
 
 object WaterService {
 
@@ -53,18 +53,21 @@ object WaterService {
           val statement = connection.prepareStatement("insert into loch_lomond (recording_date, percent_full) values(?, ?)")
           statement.setDate(1, java.sql.Date.valueOf(LochLomondData.localDate(webSiteLatest.recordingDate)))
           statement.setBigDecimal(2, webSiteLatest.percentFull.bigDecimal)
-          try {
+          val update = Try {
             statement.executeUpdate
             statement.close
+            true
           }
-          catch {
-            case ex: SQLException =>
-              print(ex)
+          update match {
+            case Success(value) => value
+            case Failure(ex) => {
+              println(ex)
+              false
+            }
           }
         }
       }
-    }
-    false
+    } else false
   }
 
   def readingDate(elements: Elements) = {

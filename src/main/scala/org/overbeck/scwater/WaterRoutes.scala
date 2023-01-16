@@ -4,6 +4,7 @@ import cask.model.Response
 import ujson.Value
 
 import java.sql.{DriverManager, ResultSet, Timestamp}
+import java.time.LocalDate
 import scala.util.Using
 
 case class WaterRoutes() (implicit val log: cask.Logger) extends cask.Routes {
@@ -11,21 +12,7 @@ case class WaterRoutes() (implicit val log: cask.Logger) extends cask.Routes {
   @cask.getJson("/lochlomond")
   def lochLomondReservoirLevels(): Response[Value] = {
     val appJson = Seq("Content-Type" -> "application/json")
-    val url = "jdbc:postgresql://localhost/overbeck"
-    Using.resource(DriverManager.getConnection(url, "overbeck", null)) { connection => {
-      val statement = connection.createStatement()
-      val resultSet = statement.executeQuery("SELECT recording_date, percent_full, created_timestamp  from loch_lomond order by recording_date")
-      val data: Seq[LochLomondData] = new Iterator[ResultSet] {
-        override def hasNext: Boolean = resultSet.next
-
-        override def next(): ResultSet = resultSet
-      }.to(LazyList).map(rs => LochLomondData(
-        rs.getString("recording_date"),
-        rs.getBigDecimal("percent_full"),
-        Option(rs.getString("created_timestamp"))
-      ))
-      cask.Response(upickle.default.writeJs(data), 200, appJson)
-    }}
+    cask.Response(upickle.default.writeJs(WaterService.existingData()), 200, appJson)
   }
 
   initialize()
@@ -42,4 +29,5 @@ case class LochLomondData(
                          )
 object LochLomondData {
   implicit def lochLomondRS: upickle.default.ReadWriter[LochLomondData] = upickle.default.macroRW[LochLomondData]
+  def localDate(recordingDate: String): LocalDate = LocalDate.parse(recordingDate)
 }

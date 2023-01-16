@@ -4,17 +4,67 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 
+import java.sql.{DriverManager, ResultSet, SQLException}
 import java.time.LocalDate
+import scala.util.Using
 
 object WaterService {
 
   private val readingDatePattern = "ending on\\s+(\\S+)".r
   private val dateOnPagePattern = "(\\d{1,2})/(\\d{1,2})/(\\d{4})".r
-  def latestWaterData(): LochLomondData = {
+
+  def latestWaterData: LochLomondData = {
     val connection = Jsoup.connect("https://www.cityofsantacruz.com/government/city-departments/water/weekly-water-conditions")
     val document = connection.get()
-    LochLomondData(readingDate(document.select("strong:contains(ending on)")).getOrElse(""), percentOfCapacity(document).getOrElse(null), Option.empty)
+    LochLomondData(readingDate(document.select("strong:contains(ending on)")).getOrElse(""), percentOfCapacity(document).orNull, Option.empty)
+  }
 
+  def existingData(): List[LochLomondData] = {
+    Using.resource(dbConnection) { connection =>
+      {
+        val statement = connection.createStatement()
+        val resultSet = statement.executeQuery("SELECT recording_date, percent_full, created_timestamp from loch_lomond order by recording_date")
+        val data: Seq[LochLomondData] = new Iterator[ResultSet] {
+          override def hasNext: Boolean = resultSet.next
+
+          override def next(): ResultSet = resultSet
+        }.to(LazyList).map(rs => LochLomondData(
+          rs.getString("recording_date"),
+          rs.getBigDecimal("percent_full"),
+          Option(rs.getString("created_timestamp"))
+        ))
+        data.toList
+      }
+    }
+  }
+
+  private def dbConnection = {
+    val dbUrl = "jdbc:postgresql://localhost/overbeck"
+    DriverManager.getConnection(dbUrl, "overbeck", null)
+  }
+
+  def updateIfNecessary(): Boolean = {
+    val webSiteLatest = latestWaterData
+    val dbData = existingData()
+    val lastInDb = dbData.last
+    if (webSiteLatest.recordingDate > lastInDb.recordingDate) {
+      Using.resource(dbConnection) {
+        connection => {
+          val statement = connection.prepareStatement("insert into loch_lomond (recording_date, percent_full) values(?, ?)")
+          statement.setDate(1, java.sql.Date.valueOf(LochLomondData.localDate(webSiteLatest.recordingDate)))
+          statement.setBigDecimal(2, webSiteLatest.percentFull.bigDecimal)
+          try {
+            statement.executeUpdate
+            statement.close
+          }
+          catch {
+            case ex: SQLException =>
+              print(ex)
+          }
+        }
+      }
+    }
+    false
   }
 
   def readingDate(elements: Elements) = {

@@ -39,7 +39,7 @@ object WaterService {
   }
 
   private def dbConnection = {
-    val dbUrl = "jdbc:postgresql://localhost/overbeck"
+    val dbUrl = "jdbc:postgresql://postgres_db/overbeck"
     DriverManager.getConnection(dbUrl, "overbeck", null)
   }
 

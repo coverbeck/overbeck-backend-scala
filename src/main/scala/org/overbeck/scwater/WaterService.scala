@@ -48,8 +48,10 @@ object WaterService {
     val dbData = existingData()
     val lastInDb = dbData.last
     if (webSiteLatest.recordingDate > lastInDb.recordingDate) {
+      println("About to update database")
       Using.resource(dbConnection) {
         connection => {
+          println("Got the connection")
           val statement = connection.prepareStatement("insert into loch_lomond (recording_date, percent_full) values(?, ?)")
           statement.setDate(1, java.sql.Date.valueOf(LochLomondData.localDate(webSiteLatest.recordingDate)))
           statement.setBigDecimal(2, webSiteLatest.percentFull.bigDecimal)
@@ -61,7 +63,8 @@ object WaterService {
           update match {
             case Success(value) => value
             case Failure(ex) => {
-              println(ex)
+              println("Error updating DB: " + ex)
+              ex.printStackTrace()
               false
             }
           }

@@ -33,7 +33,9 @@ object WaterService {
           rs.getBigDecimal("percent_full"),
           Option(rs.getString("created_timestamp"))
         ))
-        data.toList
+        val dataList = data.toList
+        resultSet.close
+        dataList
       }
     }
   }

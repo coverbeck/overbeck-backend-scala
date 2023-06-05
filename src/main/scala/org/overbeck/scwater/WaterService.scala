@@ -11,7 +11,7 @@ import scala.util.{Failure, Success, Try, Using}
 object WaterService {
 
   private val readingDatePattern = "ending on\\s+(\\S+)".r
-  private val dateOnPagePattern = "(\\d{1,2})/(\\d{1,2})/(\\d{4})".r
+  private val dateOnPagePattern = "(\\d{1,2})/(\\d{1,2})/(\\d{2,4})".r
 
   def latestWaterData: LochLomondData = {
     val connection = Jsoup.connect("https://www.cityofsantacruz.com/government/city-departments/water/weekly-water-conditions")
@@ -96,8 +96,8 @@ object WaterService {
     val elements = document.select("td:contains(Percent of capacity)")
     if (elements.size == 1) {
       val percentStr = elements.next().text()
-      // Remove the percentage sign
-      Some(BigDecimal(percentStr.substring(0, percentStr.length - 1)))
+      // Remove the percentage sign, which now has a leading space
+      Some(BigDecimal(percentStr.replaceAll("\\s*%", "")))
     } else None
   }
 }

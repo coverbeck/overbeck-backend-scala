@@ -14,7 +14,7 @@ object WaterService {
   private val dateOnPagePattern = "(\\d{1,2})/(\\d{1,2})/(\\d{2,4})".r
 
   def latestWaterData: LochLomondData = {
-    val connection = Jsoup.connect("https://www.cityofsantacruz.com/government/city-departments/water/weekly-water-conditions")
+    val connection = Jsoup.connect("https://www.cityofsantacruz.com/government/city-departments/water/weekly-water-conditions").userAgent("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0")
     val document = connection.get()
     LochLomondData(readingDate(document.select("strong:contains(ending on)")).getOrElse(""), percentOfCapacity(document).orNull, Option.empty)
   }
@@ -26,7 +26,7 @@ object WaterService {
         val resultSet = statement.executeQuery("SELECT recording_date, percent_full, created_timestamp from loch_lomond order by recording_date")
         val data: Seq[LochLomondData] = new Iterator[ResultSet] {
           override def hasNext: Boolean = resultSet.next
-
+;
           override def next(): ResultSet = resultSet
         }.to(LazyList).map(rs => LochLomondData(
           rs.getString("recording_date"),

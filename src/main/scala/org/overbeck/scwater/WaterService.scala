@@ -14,7 +14,7 @@ object WaterService {
   private val dateOnPagePattern = "(\\d{1,2})/(\\d{1,2})/(\\d{2,4})".r
 
   def latestWaterData: LochLomondData = {
-    val connection = Jsoup.connect("https://www.cityofsantacruz.com/government/city-departments/water/weekly-water-conditions").userAgent("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0")
+    val connection = Jsoup.connect("https://www.santacruzca.gov/Government/City-Departments/Water-Department/Weekly-Water-Conditions-in-Santa-Cruz").userAgent("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0")
     val document = connection.get()
     LochLomondData(readingDate(document.select("strong:contains(ending on)")).getOrElse(""), percentOfCapacity(document).orNull, Option.empty)
   }
@@ -93,7 +93,7 @@ object WaterService {
   }
 
   def percentOfCapacity(document: Document): Option[BigDecimal] = {
-    val elements = document.select("td:contains(Percent of capacity)")
+    val elements = document.select("p:contains(Percent of capacity)")
     if (elements.size == 1) {
       val percentStr = elements.next().text()
       // Remove the percentage sign, which now has a leading space

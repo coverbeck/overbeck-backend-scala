@@ -95,9 +95,14 @@ object WaterService {
   def percentOfCapacity(document: Document): Option[BigDecimal] = {
     val elements = document.select("p:contains(Percent of capacity)")
     if (elements.size == 1) {
-      val percentStr = elements.next().text()
-      // Remove the percentage sign, which now has a leading space
-      Some(BigDecimal(percentStr.replaceAll("\\s*%", "")))
+      val percentStr = elements.text()
+      val CapacityRegex = """Percent of capacity: ([\d.]+)""".r.unanchored
+
+      percentStr match {
+        case CapacityRegex(value) => Some(BigDecimal(value))
+        case _ => None
+      }
+
     } else None
   }
 }

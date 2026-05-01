@@ -7,7 +7,7 @@ object WaterServiceTest extends TestSuite {
 
   val tests = Tests {
     val waterData = WaterService.latestWaterData
-    assert(waterData.recordingDate != None)
+    assert(waterData.recordingDate != null)
     print(waterData)
   }
 

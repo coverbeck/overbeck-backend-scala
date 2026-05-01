@@ -20,10 +20,14 @@ object Scraper {
     upickle.default.writeJs(scraperData(rawScraperData))
   }
 
+  def scraperData(): Seq[ScraperData] = {
+    scraperData(rawScraperData)
+  }
+
   def item(item: Int): Option[ScrapedData] = {
     scraperData(rawScraperData).find(s => s.id == item ) match {
       case Some(s) => {
-        val doc = Jsoup.connect(s.url).get()
+        val doc = Jsoup.connect(s.url).userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15").header("accept-language", "en-US,en;q=0.9").get()
         val elements: Elements = doc.select(s.selector)
         if (elements.isEmpty) None
         else {
@@ -44,6 +48,7 @@ object Scraper {
     }
   }
 
+
   private def imageUrl(s: ScraperData, elements: Elements): Option[String] = {
     if (s.attribute.startsWith("data-")) elements.get(0).attributes().dataset().asScala.get(s.attribute.substring(5))
     else Option(elements.get(0).attributes().get(s.attribute))
@@ -51,7 +56,7 @@ object Scraper {
 
   private def headers(item: requests.Response) = {
     Seq("content-type", "content-disposition", "content-transfer-encoding").flatMap(headerName => {
-      item.headers.get(headerName).getOrElse(Seq.empty[String]).map(s => (headerName -> s))
+      item.headers.getOrElse(headerName, Seq.empty[String]).map(s => (headerName -> s))
     })
   }
 

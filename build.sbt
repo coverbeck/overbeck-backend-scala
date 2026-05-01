@@ -17,7 +17,7 @@ name := "overbeck-backend"
 
 version := "0.0.1"
 
-scalaVersion := "2.13.4"
+scalaVersion := "2.13.16"
 
 libraryDependencies ++= Seq(
   "com.lihaoyi" %% "cask" % "0.7.4",
